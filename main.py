@@ -21,12 +21,20 @@ for device in pd:
         send = socket.getOutputStream()
 
         if (socket.isConnected()):
-            s = String("test" + "\n") # отсылаемое на устройство сообщение
+            s = String("r" + "\n") # отсылаемое на устройство сообщение
             b = s.getBytes()
             send.write(b)
             send.flush()
 
-            test = 'ok'
+            getting_bytes = get.read()
+            test = []
+            while (len(test) < 25):
+                getting_bytes = get.read()
+                test.append(getting_bytes)
+
+            # getting_bytes = get.available()
+            # test = getting_bytes
+
         else:
             test = 'no'
 

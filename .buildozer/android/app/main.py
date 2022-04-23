@@ -1,7 +1,7 @@
 #qpy:kivy
 from jnius import autoclass
 
-fox = 'fox_3_05c0d1405613c'
+fox = 'fox_3_05c0d1405613c' # название устройства
 
 BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
 BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
@@ -21,27 +21,22 @@ for device in pd:
         send = socket.getOutputStream()
 
         if (socket.isConnected()):
-            s = String("test" + "\n")
+            s = String("r" + "\n") # отсылаемое на устройство сообщение
             b = s.getBytes()
             send.write(b)
             send.flush()
 
-            test = 'ok'
+            getting_bytes = get.read()
+            test = []
+            while (len(test) < 25):
+                getting_bytes = get.read()
+                test.append(getting_bytes)
+
+            # getting_bytes = get.available()
+            # test = getting_bytes
+
         else:
             test = 'no'
-
-# def get_socket_stream(name):
-#     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
-#     socket = None
-#     for device in paired_devices:
-#         if device.getName() == name:
-#             socket = device.createRfcommSocketToServiceRecord(
-#                 UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
-#             recv_stream = socket.getInputStream()
-#             send_stream = socket.getOutputStream()
-#             break
-#     socket.connect()
-#     return recv_stream, send_stream
 
 #########################################################################################################
 
@@ -56,9 +51,6 @@ class MyApp(App):
 
     def build(self):
         global test
-        # recv_stream, send_stream = get_socket_stream(fox)
-        # send_stream.write('test')
-        # send_stream.flush()
         return TextInput(text=str(test))
 
 

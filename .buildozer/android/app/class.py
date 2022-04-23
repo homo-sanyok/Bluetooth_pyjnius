@@ -1,48 +1,39 @@
+#qpy:kivy
 from jnius import autoclass
 
-class AndroidBluetoothClass:
+fox = 'fox_3_05c0d1405613c' # название устройства
 
-    # def test(self):
-    #     global test
-    #     test = self.BluetoothAdapter.getDefaultAdapter().getAddress()
+BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
+BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
+BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
+UUID = autoclass('java.util.UUID')
+String = autoclass('java.lang.String')
 
-    def getAndroidBluetoothSocket(self,DeviceName): #вызываешь функцию, чтобы соединиться с устройством. В функцию всталяешь название устройства, как его видит смартфон
-        paired_devices = self.BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
-        socket = None
-        for device in paired_devices:
-            if device.getName() == DeviceName:
-                socket = device.createRfcommSocketToServiceRecord(
-                    self.UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
-                self.ReceiveData = self.BufferReader(self.InputStream(socket.getInputStream()))
-                self.SendData = socket.getOutputStream()
-                socket.connect()
-                self.ConnectionEstablished = True
-                print('Bluetooth Connection successful')
-        return self.ConnectionEstablished
+global test
+pd = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
+socket = None
+for device in pd:
+    if (device.getName() == fox):
+        socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
+        BluetoothAdapter.cancelDiscovery()
+        socket.connect()
+        get = socket.getInputStream()
+        send = socket.getOutputStream()
 
+        if (socket.isConnected()):
+            s = String("r" + "\n") # отсылаемое на устройство сообщение
+            b = s.getBytes()
+            send.write(b)
+            send.flush()
 
-    def BluetoothSend(self, Message, *args): #отправляет сообщение
-        if self.ConnectionEstablished == True:
-            self.SendData.write(Message)
-        else:print('Bluetooth device not connected')
+            getting_bytes = get.read()
+            test = []
+            while (len(test) < 25):
+                getting_bytes = get.read()
+                test.append(getting_bytes)
 
+            # getting_bytes = get.available()
+            # test = getting_bytes
 
-    def BluetoothReceive(self,*args): #получает сообщения
-        DataStream = ''
-        if self.ConnectionEstablished == True:
-            DataStream = str(self.ReceiveData.readline())
-        return DataStream
-
-
-    def __init__(self): #тут даже не заморачивайся, это магия
-        self.BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
-        self.BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
-        self.BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
-        self.UUID = autoclass('java.util.UUID')
-        self.BufferReader = autoclass('java.io.BufferedReader')
-        self.InputStream = autoclass('java.io.InputStreamReader')
-        self.ConnectionEstablished = False
-
-
-    def __del__(self):
-        print('class AndroidBluetooth destroyer')
+        else:
+            test = 'no'
